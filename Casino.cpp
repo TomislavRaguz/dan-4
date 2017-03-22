@@ -1,7 +1,7 @@
 // Casino.cpp : Defines the entry point for the console application.
 //
-
 #include "stdafx.h"
+#include <stdlib.h>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -17,6 +17,70 @@ int g_cip=0;
 void glavni_izbornik();
 
 bool wayToSort(int i, int j) { return i > j; }
+
+struct Karta {
+	Karta(int a, int b) {
+		vrijednost = a; switch (b) {
+		case 1:
+			tip = "pik";
+			break;
+		case 2:
+			tip = "herc";
+			break;
+		case 3:
+			tip = "tref";
+			break;
+		case 4:
+			tip = "Kara";
+			break;
+		};
+		switch (a) {
+		case 1:
+			lice = "as";
+			break;
+		case 2:
+			lice = "dvica";
+			break;
+		case 3:
+			lice = "trica";
+			break;
+		case 4:
+			lice = "èetvorka";
+			break;
+		case 5:
+			lice = "petica";
+			break;
+		case 6:
+			lice = "šestica";
+			break;
+		case 7:
+			lice = "sedmica";
+			break;
+		case 8:
+			lice = "osmica";
+			break;
+		case 9:
+			lice = "devetka";
+			break;
+		case 10:
+			lice = "desetka";
+			break;
+		case 11:
+			lice = "decko";
+			break;
+		case 12:
+			lice = "dama";
+			break;
+		case 13:
+			lice = "kralj";
+			break;
+		};
+	}
+	Karta() { vrijednost = 0; tip = 1; lice = 1; };
+	int vrijednost;
+	string tip;
+	string lice;
+};
 
 void uplata() {
 	int broj;
@@ -60,7 +124,7 @@ void jack() {
 		int drugi = rand() % 4;
 		int treci = rand() % 4;
 		cout << polja[prvi] << polja[drugi] << polja[treci] << endl;
-		if (prvi == drugi && drugi == treci) { cout << "Bingo!Osvojili ste" << bet * 20 << " zetona."; g_cip += bet * 20; hiskore.push_back((bet * 20)); sort(hiskore.begin(), (hiskore.begin() + 4),wayToSort); hiskore.pop_back();  }
+		if (prvi == drugi && drugi == treci) { cout << "Bingo!Osvojili ste" << bet * 20 << " zetona."; g_cip += bet * 15; hiskore.push_back((bet * 15)); sort(hiskore.begin(), (hiskore.begin() + 4),wayToSort); hiskore.pop_back();  }
 		cout << "Trenutni balans: " << g_cip << endl;
 		cin >> bet;
 	}
@@ -119,17 +183,18 @@ void double_or() {
 	hiskor >> skor1 >> skor2 >> skor3;
 	vector<int> hiskore = { skor1,skor2,skor3 };
 	hiskor.close();
-	srand(time(NULL));
-	int bet,prvi,drugi,pkarta,dkarta,izv_kart;
+	std::srand(time(NULL));
+	int bet,prvi,drugi,izv_kart;
+	Karta pkarta, dkarta;
 	string input;
-	cout << "\nKoliko zelite da vam bude pocetni ulog?";
-	cin >> bet;
+	std::cout << "\nKoliko zelite da vam bude pocetni ulog?";
+	std::cin >> bet;
 	g_cip -= bet;
-		vector<int> deck;
+		vector<Karta> deck;
 		izv_kart = 0;
-            for (int i = 0; i < 4; i++) {
-		       for (int j = 0; j < 13; j++) {
-			          deck.push_back((j + 1));
+            for (int i = 1; i < 5; i++) {
+		       for (int j = 1; j < 14; j++) {
+			          deck.push_back(Karta(j,i));
 		}
 	}
 			prvi = rand() % (52 - izv_kart);
@@ -138,11 +203,11 @@ void double_or() {
 			drugi = rand() % (52 - izv_kart);
 			dkarta = deck[drugi]; deck.erase(deck.begin() + drugi);
 			izv_kart++;
-			cout << "\nIzvlacimo karte!Vi ste izvukli " << pkarta << " a kuca " << dkarta;
-			if (pkarta > dkarta) {
+			std::cout << "\nIzvlacimo karte!Vi ste izvukli " << pkarta.tip<< " " << pkarta.lice << " a kuca " << dkarta.tip << " " << dkarta.lice;
+			if (pkarta.vrijednost > dkarta.vrijednost) {
 				bet *= 2;
-				cout << "\nDobitak!Dobio si "<< bet<< ".Za duplo ili nista upisite duplo!";
-				cin >> input;
+				std::cout << "\nDobitak!Dobio si "<< bet<< ".Za duplo ili nista upisite duplo!";
+				std::cin >> input;
 				while (input == "duplo") {
 					bet *= 2;
 					prvi = rand() % (52 - izv_kart);
@@ -151,20 +216,21 @@ void double_or() {
 					drugi = rand() % (52 - izv_kart);
 					dkarta = deck[drugi]; deck.erase(deck.begin() + drugi);
 					izv_kart++;
-					cout << "\nIzvlacimo karte!Vi ste izvukli " << pkarta << " a kuca " << dkarta;
-					if (pkarta > dkarta) { cout << "C C C Cooombo!Trenutni dobitak je" << bet << " ,za duplo ili nista upisite duplo!"; cin >> input; }
-					else { cout << "Odeeeee!"; bet = 0; break; }
+					std::cout << "\nIzvlacimo karte!Vi ste izvukli " << pkarta.tip << " " << pkarta.lice << " a kuca " << dkarta.tip << " " << dkarta.lice;
+					if (pkarta.vrijednost > dkarta.vrijednost) { std::cout << "C C C Cooombo!Trenutni dobitak je" << bet << " ,za duplo ili nista upisite duplo!"; cin >> input; }
+					else {std:: cout << "Odeeeee!"; bet = 0; break; }
 				}
 			}
-			else { cout << "Vise srece sljedeci puta."; bet = 0; }
-			cout << "\nOsvojili ste " << bet << " cipova.";
-			hiskore.push_back(bet); sort(hiskore.begin(), (hiskore.begin() + 4), wayToSort); hiskore.pop_back();
+			else { std::cout << "Vise srece sljedeci puta."; bet = 0; }
+			std::cout << "\nOsvojili ste " << bet << " cipova.";
+			hiskore.push_back(bet); std::sort(hiskore.begin(), (hiskore.begin() + 4), wayToSort); hiskore.pop_back();
 			ofstream pisi("highscoredouble.txt");
 			for (int i = 0; i < 3; i++) {
 				pisi << hiskore[i] << endl;
 			}
 			pisi.close();
 			g_cip += bet;
+			system("PAUSE");
 			glavni_izbornik();
 	}
 
